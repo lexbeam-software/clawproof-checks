@@ -26,4 +26,4 @@ If a check is improved based on a real incident you experienced (anonymized is f
 
 ## Questions
 
-Open an issue. For private disclosure (e.g., incident reports you don't want public yet), email contact@lexbeam.com.
+Open an issue. For private disclosure (e.g., incident reports you don't want public yet), use the contact address on the Impressum at [goclawproof.com/impressum](https://goclawproof.com/impressum).
