@@ -1,0 +1,391 @@
+{
+  "version": "1.0.0",
+  "source": "https://github.com/PicoWorx/clawproof-checks",
+  "license": "MIT",
+  "count": 10,
+  "checks": [
+    {
+      "id": "01",
+      "slug": "tool-permissions",
+      "title": "Tool Permissions & Least Privilege",
+      "category": "Security",
+      "tagline": "Your agent starts with read access. Within a month, it has keys to everything.",
+      "failure_mode": "Agents accumulate permissions over time. A read-only Stripe key becomes a broader\nrefund-capable key because a developer needed to unblock a feature. Nobody updates\nthe permission manifest. The agent is now one plausible-sounding prompt away from\nauthorizing transfers it was never supposed to touch, and the audit trail will show\nit acting well within its granted scope the entire time.\n",
+      "verification": [
+        {
+          "question": "Is every tool permission declared in a version-controlled manifest and enforced at the agent runtime, not just at the downstream API?",
+          "weight": 5
+        },
+        {
+          "question": "Is there a recurring audit (weekly or monthly) that compares granted permissions against actual usage, and revokes unused ones?",
+          "weight": 5
+        }
+      ],
+      "checklist": [
+        "Permission manifest lives in version control and requires reviewer approval for changes.",
+        "API keys are scoped to the minimum required operations; no wildcard or admin keys.",
+        "A runtime permission gateway validates every tool call against the manifest before execution.",
+        "Denied-tool patterns are listed explicitly, not just omitted, as defense in depth.",
+        "Rate limits are enforced per-tool, not only per-agent.",
+        "Short-lived tokens (<= 15 minutes) are used wherever the downstream API supports them.",
+        "Permission changes trigger alerts to a security channel and require separate approval from the feature PR.",
+        "Quarterly audit of granted vs. used permissions; revoke anything unused for 30+ days."
+      ],
+      "common_pitfalls": [
+        "Treating the manifest as documentation instead of enforcement. If the runtime does not block what the manifest forbids, you have a policy document, not a control.",
+        "Scoping at the service level (\"Stripe access\") instead of the operation level (\"Stripe charges.retrieve with read-only rate limit\").",
+        "Skipping explicit deny rules because \"anything not in the allow list is denied\" — until someone adds a new tool integration and forgets the manifest."
+      ],
+      "related": [
+        "prompt-injection",
+        "secrets-management",
+        "human-in-the-loop"
+      ],
+      "site_url": "https://goclawproof.com/checks/tool-permissions"
+    },
+    {
+      "id": "02",
+      "slug": "logging-audit-trails",
+      "title": "Logging & Audit Trails",
+      "category": "Quality",
+      "tagline": "When something breaks, can you trace what happened, why, and who approved it?",
+      "failure_mode": "An agent does something surprising in production. A user complains. The team tries\nto reconstruct what the agent saw, what it chose, what tools it called, and in what\norder. The logs contain only the final API calls. There is no record of the prompt,\nthe retrieved context, the tool selection reasoning, or the alternatives the agent\nconsidered and rejected. The incident becomes unsolvable.\n",
+      "verification": [
+        {
+          "question": "Does every agent interaction produce a structured log entry that captures the input, retrieved context, tool calls with parameters, tool results, and final output?",
+          "weight": 5
+        },
+        {
+          "question": "Are logs tamper-evident (append-only, signed, or in an audit-grade store) and retained long enough to support regulatory or incident investigations?",
+          "weight": 5
+        }
+      ],
+      "checklist": [
+        "Each turn of the agent produces one structured log record with a correlation ID tying prompt, retrieval, tool calls, and output together.",
+        "Tool call parameters are captured in full; tool results are captured or hashed with a pointer to the source if large.",
+        "Personally identifiable information is redacted or tokenized before logging, not removed after the fact.",
+        "Logs are shipped off-host to an append-only store (S3 with object lock, immudb, or equivalent).",
+        "Retention matches the longest of compliance requirements, incident-investigation needs, and model-evaluation replay windows.",
+        "A sample incident is regularly reconstructed from logs alone to prove the trail is sufficient.",
+        "Log schema is versioned; breaking changes are tracked so old logs remain queryable."
+      ],
+      "common_pitfalls": [
+        "Logging only the final API response and losing the agent's reasoning and tool-selection steps.",
+        "Storing logs in the same database the agent can write to — an agent incident can then overwrite its own evidence.",
+        "Retaining logs forever with PII intact; GDPR / privacy laws require retention limits and data-subject deletion paths."
+      ],
+      "related": [
+        "evaluation-testing",
+        "human-in-the-loop",
+        "data-boundaries"
+      ],
+      "site_url": "https://goclawproof.com/checks/logging-audit-trails"
+    },
+    {
+      "id": "03",
+      "slug": "prompt-injection",
+      "title": "Prompt Injection & Data Exfiltration",
+      "category": "Security",
+      "tagline": "Untrusted content in, secrets out. The attack surface nobody tests.",
+      "failure_mode": "An agent ingests content it did not author — a support ticket, a PDF, a webpage, an\nemail — and that content contains instructions disguised as data. The agent follows\nthe instructions. It exfiltrates secrets via a tool call to an attacker-controlled\nURL, or it takes privileged actions on behalf of the attacker. The team only\ndiscovers the breach when the downstream damage becomes visible.\n",
+      "verification": [
+        {
+          "question": "Is every piece of untrusted content (user input, retrieved documents, tool outputs from external sources) treated as data, not as instructions, with clear delimiters and system-prompt boundaries?",
+          "weight": 5
+        },
+        {
+          "question": "Are outbound tool calls constrained so the agent cannot send data to arbitrary destinations (no open URL fetch, no arbitrary email recipients, no free-form webhooks)?",
+          "weight": 5
+        }
+      ],
+      "checklist": [
+        "System prompts explicitly instruct the agent to ignore instructions inside user/retrieved content.",
+        "Untrusted content is wrapped in clearly delimited blocks (e.g., XML tags, triple backticks) with instructions to never treat the content as commands.",
+        "Outbound tool destinations are allowlisted; no free-form URL or email-recipient parameters.",
+        "A content filter scans agent outputs for likely data exfiltration patterns (base64 blobs to external URLs, unexpected recipient lists).",
+        "A red-team prompt suite runs in CI; every release is smoke-tested against known injection patterns.",
+        "User-facing tools that accept files run the file through a sanitizer and a size limit before handing to the agent.",
+        "High-risk actions (transfers, deletions, outbound emails to new recipients) require human approval regardless of agent confidence."
+      ],
+      "common_pitfalls": [
+        "Assuming a strong system prompt is sufficient. Determined injections defeat prompt-only defenses; destination allowlists are the actual enforcement layer.",
+        "Running a prompt-injection test suite once at launch and never again. Model upgrades change attack surface; the suite must run on every release.",
+        "Treating internal documents as \"trusted.\" Any document written by a human user of the system is untrusted by definition."
+      ],
+      "related": [
+        "tool-permissions",
+        "secrets-management",
+        "data-boundaries"
+      ],
+      "site_url": "https://goclawproof.com/checks/prompt-injection"
+    },
+    {
+      "id": "04",
+      "slug": "human-in-the-loop",
+      "title": "Human-in-the-Loop & Escalation Paths",
+      "category": "Governance",
+      "tagline": "When should an agent stop and ask? Define the boundaries before production.",
+      "failure_mode": "An agent handles a high-stakes case autonomously because no escalation threshold was\ndefined. Weeks later, a regulator, a customer, or a lawyer asks why a human did not\nreview it. The answer — \"the agent did not flag it\" — is not an answer. The failure\nwas not the agent's judgment; the failure was the absence of a policy telling the\nagent when its judgment should yield to a human.\n",
+      "verification": [
+        {
+          "question": "For every agent capability, is there a declared threshold (financial, legal, reputational, confidence-based) above which the agent must pause for human approval?",
+          "weight": 5
+        },
+        {
+          "question": "Is the escalation path itself tested — does a real human actually receive, review, and either approve or deny the pause within the declared SLA?",
+          "weight": 5
+        }
+      ],
+      "checklist": [
+        "Every agent capability has a documented escalation threshold (e.g., transactions >= X EUR, any legal-adjacent action, confidence < Y).",
+        "Escalation reaches a named channel (Slack, ticket, pager) with the agent's reasoning and proposed action attached.",
+        "A service-level agreement is declared (e.g., \"95% of escalations resolved within 30 minutes\") and monitored.",
+        "Approvers have a one-click approve/deny UI, not a free-form instruction box that reopens the full autonomy surface.",
+        "Denied escalations produce a feedback loop that updates thresholds or system prompts for similar future cases.",
+        "Escalations that time out default to the safe action (deny, hold, queue) — never the permissive action.",
+        "Out-of-hours escalation paths exist (on-call rotation, regional routing, or documented next-business-day hold)."
+      ],
+      "common_pitfalls": [
+        "Defining thresholds but no reviewer staffing. An escalation channel nobody watches is not governance.",
+        "Using \"low confidence\" as the only escalation trigger. Agents can be confidently wrong; threshold-based triggers (financial, legal) are more robust.",
+        "Allowing approvers to issue free-form instructions to the agent on approval. This reopens the attack surface the escalation was meant to close."
+      ],
+      "related": [
+        "rollback-kill-switches",
+        "multi-agent-coordination",
+        "tool-permissions"
+      ],
+      "site_url": "https://goclawproof.com/checks/human-in-the-loop"
+    },
+    {
+      "id": "05",
+      "slug": "rollback-kill-switches",
+      "title": "Rollback, Kill-Switches & Incident Response",
+      "category": "Operations",
+      "tagline": "Can you stop your agent in 30 seconds? If not, you're not production-ready.",
+      "failure_mode": "An agent starts producing harmful output at 3 AM. The on-call engineer tries to stop\nit and discovers there is no single button. Disabling it requires revoking API keys,\npushing a config change, waiting for a deploy, and hoping the in-flight requests\nfinish. By the time the agent is actually silent, the incident has been running for\n45 minutes and the damage is done.\n",
+      "verification": [
+        {
+          "question": "Is there a single documented action (one button, one CLI command, one feature flag) that stops the agent from taking any new action within 30 seconds?",
+          "weight": 5
+        },
+        {
+          "question": "For each destructive or public-facing capability, is there a reversible path — dry-run mode, staging replay, compensating transaction — that can undo recent agent actions?",
+          "weight": 5
+        }
+      ],
+      "checklist": [
+        "A kill switch exists at the orchestration layer (feature flag, circuit breaker, or config switch) and halts new agent runs without requiring a deploy.",
+        "The kill switch is tested on a regular cadence (monthly); time-to-halt is measured and trended.",
+        "In-flight agent actions have an idempotency key and a cancellation path where the downstream API supports it.",
+        "Destructive actions have a dry-run mode toggled by a flag so you can prove what an agent would do before it does it.",
+        "An incident runbook lives in the same repo as the agent; on-call knows where to find it without opening the browser.",
+        "Rollback is rehearsed; the team has actually pressed the button in a drill, not just designed the button.",
+        "Public-facing outputs (emails, posts, payments) have a retraction path — compensating message, reversal, or customer-service workflow."
+      ],
+      "common_pitfalls": [
+        "Kill switch lives in a different repo or team's infrastructure, making it slow to activate in a real incident.",
+        "The so-called kill switch really just revokes the API key, which takes effect only for new requests and leaves in-flight actions running.",
+        "No rehearsal. The switch exists on paper but has never been pulled; the first time is during the real incident."
+      ],
+      "related": [
+        "human-in-the-loop",
+        "cost-controls",
+        "logging-audit-trails"
+      ],
+      "site_url": "https://goclawproof.com/checks/rollback-kill-switches"
+    },
+    {
+      "id": "06",
+      "slug": "secrets-management",
+      "title": "Secrets Management & Credential Isolation",
+      "category": "Security",
+      "tagline": "API keys in prompts, tokens in logs. Zero secret sprawl or bust.",
+      "failure_mode": "A debug prompt is saved to a branch with a Slack bot token inlined. A logging\nmiddleware prints the full HTTP request including the Authorization header. An agent\nsummarizes its context back to a user and the summary contains a rotating OAuth\ntoken. None of these are exotic attacks; they are the default path when secrets are\ntreated as ordinary strings inside agent workflows.\n",
+      "verification": [
+        {
+          "question": "Are all secrets injected via a secret manager (AWS Secrets Manager, Vault, environment of the orchestrator) rather than hardcoded in prompts, configs, or repo files?",
+          "weight": 5
+        },
+        {
+          "question": "Is there automated scanning — at commit time and at log-write time — that prevents secrets from leaking into repos, logs, telemetry, or agent outputs?",
+          "weight": 5
+        }
+      ],
+      "checklist": [
+        "Secrets are stored in a dedicated secret manager; the agent process reads them via an API call or mounted file, not from repo-checked-in config.",
+        "Commit-time secret scanning (gitleaks, trufflehog, GitHub secret scanning) is enabled on every branch.",
+        "Log-write middleware scrubs known secret patterns (API key prefixes, JWT shapes, Bearer tokens) before persistence.",
+        "Agent output filters strip any pattern matching a known secret before the response leaves the system.",
+        "Secrets rotate on a schedule; the rotation is automated, not manual.",
+        "Each secret has an owner and a purpose in a central inventory; unowned secrets are candidates for removal.",
+        "Dev/staging/prod use separate secrets; no cross-environment sharing even for \"convenience.\""
+      ],
+      "common_pitfalls": [
+        "Using `.env` files committed to the repo \"just for dev.\" Once a secret is in git history, rotation is the only fix.",
+        "Logging full HTTP requests or LLM completions without an output filter — tokens leak via logs even if the code handles them correctly.",
+        "Storing secrets in the system prompt because \"the model will not repeat them.\" The model will. Eventually. Reliably."
+      ],
+      "related": [
+        "tool-permissions",
+        "prompt-injection",
+        "logging-audit-trails"
+      ],
+      "site_url": "https://goclawproof.com/checks/secrets-management"
+    },
+    {
+      "id": "07",
+      "slug": "evaluation-testing",
+      "title": "Evaluation & Regression Testing",
+      "category": "Quality",
+      "tagline": "You upgrade the model. Agent behavior changes. No tests caught it.",
+      "failure_mode": "A new model version ships. Benchmarks are slightly better on paper. The team upgrades\nin production. A week later, support tickets reveal the agent is now refusing valid\nrequests, or hallucinating on a specific edge case, or subtly changing its tone in a\nway that violates the brand. There was no regression suite that would have caught\nany of this before the rollout.\n",
+      "verification": [
+        {
+          "question": "Is there a versioned evaluation suite with representative inputs, expected behaviors, and automated grading that runs on every model or prompt change?",
+          "weight": 5
+        },
+        {
+          "question": "Do production releases require the eval suite to pass with no regressions against the previous version, not just absolute score thresholds?",
+          "weight": 5
+        }
+      ],
+      "checklist": [
+        "Eval set contains at least 50 representative inputs covering the happy path, edge cases, adversarial inputs, and known-failure modes.",
+        "Each eval has a clearly defined grading criterion (exact match, LLM-judged rubric, regex, structural check) — not just \"looks good to the engineer.\"",
+        "The suite runs automatically on every prompt change, tool change, model change, and on a weekly schedule against production.",
+        "Regression gating compares new version against previous version; no single eval may degrade by more than a defined threshold without sign-off.",
+        "Failed evals produce concrete diffs (input, expected, actual) that make root cause obvious.",
+        "Eval dataset grows from production incidents; each incident converts into a new eval that would have caught it.",
+        "A rotating subset of production traffic is shadow-tested against candidate versions before any rollout."
+      ],
+      "common_pitfalls": [
+        "A flat \"94%\" headline number that is not compared against the previous version can hide dozens of regressions offset by dozens of improvements.",
+        "Using the same LLM as both subject and judge without considering self-consistency bias; use a different model or a deterministic grader where possible.",
+        "Eval dataset written once and never updated; production drift means the suite stops reflecting real traffic within weeks."
+      ],
+      "related": [
+        "logging-audit-trails",
+        "data-boundaries",
+        "multi-agent-coordination"
+      ],
+      "site_url": "https://goclawproof.com/checks/evaluation-testing"
+    },
+    {
+      "id": "08",
+      "slug": "data-boundaries",
+      "title": "Data Boundaries & RAG Governance",
+      "category": "Governance",
+      "tagline": "Your agent can read everything it retrieves. Can it read everything it should?",
+      "failure_mode": "A RAG pipeline indexes a shared drive. The index includes HR files, M&A working\ndocuments, legal hold material, and customer PII. An employee asks the agent a\nbenign question; the retrieval step pulls a paragraph from a confidential document\nand feeds it into the answer. The agent happily summarizes it. The employee now\nknows something they were never authorized to see.\n",
+      "verification": [
+        {
+          "question": "Does the retrieval layer enforce access-control at query time (row-level security, per-user corpora, ACL filters) — not just at the UI layer of the source system?",
+          "weight": 5
+        },
+        {
+          "question": "Is the RAG corpus audited for data classes (PII, PHI, trade secrets, legal-privileged, retention-limited) with a declared policy for each, including what may not be indexed at all?",
+          "weight": 5
+        }
+      ],
+      "checklist": [
+        "Every document in the retrieval index carries metadata for classification, owner, source system, and original ACLs.",
+        "The retrieval query filters by the end user's identity and groups; no query returns documents the user cannot access in the source system.",
+        "Re-indexing runs on a schedule that keeps the index within an acceptable freshness window for permission changes (minutes to hours, not days).",
+        "A quarantine list keeps specific document types (HR investigations, legal holds, live M&A) out of the index entirely.",
+        "Retention policies are mirrored in the index — when the source is deleted or expires, the index entry is too.",
+        "PII in retrieved passages is redacted or tokenized before being passed to the model, where feasible.",
+        "An audit log records which documents were retrieved for which user on which query, sufficient to answer \"who saw what, when.\""
+      ],
+      "common_pitfalls": [
+        "Relying on the source system's ACLs without replicating them into the index; the agent query bypasses the source UI and its permission checks.",
+        "Indexing \"everything\" because filtering is hard; sensitive document classes leak via embeddings even if the final answer omits them.",
+        {
+          "Freshness lag on permission updates": "a fired employee's permissions are revoked in the source, but the vector index still returns documents from their old access for hours or days."
+        }
+      ],
+      "related": [
+        "prompt-injection",
+        "logging-audit-trails",
+        "human-in-the-loop"
+      ],
+      "site_url": "https://goclawproof.com/checks/data-boundaries"
+    },
+    {
+      "id": "09",
+      "slug": "cost-controls",
+      "title": "Cost Controls & Rate Limiting",
+      "category": "Operations",
+      "tagline": "A runaway loop at 3AM. No spending cap. Monday morning surprise.",
+      "failure_mode": "An agent enters a loop — maybe a tool call fails and triggers a retry, maybe two\nagents are calling each other, maybe a user input leads it into a recursive\nclarification cycle. By the time anyone notices, the LLM bill has grown by a factor\nof a thousand, rate limits on the downstream API are exhausted, and legitimate\ntraffic is being rejected. The fix is easy. Preventing it was easier.\n",
+      "verification": [
+        {
+          "question": "Is there a hard spending cap, enforced at the orchestration layer, that halts the agent when daily/hourly cost crosses a declared threshold?",
+          "weight": 5
+        },
+        {
+          "question": "Are per-agent and per-user rate limits enforced independently of the LLM provider's own limits, with alerts firing before limits are hit?",
+          "weight": 5
+        }
+      ],
+      "checklist": [
+        "Per-agent and per-user token / call / EUR budgets are defined and enforced at the orchestration layer, not relied on at the provider.",
+        "A circuit breaker trips when a single conversation exceeds N turns or M tokens and forces escalation to a human.",
+        "Retries use exponential backoff with a max-retry cap; no unbounded retry loops.",
+        "Agent-to-agent calls have a separate, stricter budget to prevent loop amplification.",
+        "Cost alerts fire at 50%, 75%, 90% of daily budget to a channel humans actually watch.",
+        "Rate limits are tested under synthetic load before production.",
+        "A daily cost report summarizes spend by agent, by user, by tool, so anomalies surface within 24 hours."
+      ],
+      "common_pitfalls": [
+        "Relying on the LLM provider's rate limits as the cost control. Provider limits protect the provider, not your wallet.",
+        "No per-user cap. A single abusive or stuck user can consume the entire daily budget before anyone notices.",
+        "Alerts without a human watching them. The circuit breaker, not the alert, is the enforcement; the alert is just the notification."
+      ],
+      "related": [
+        "rollback-kill-switches",
+        "multi-agent-coordination",
+        "tool-permissions"
+      ],
+      "site_url": "https://goclawproof.com/checks/cost-controls"
+    },
+    {
+      "id": "10",
+      "slug": "multi-agent-coordination",
+      "title": "Multi-Agent Coordination & Trust",
+      "category": "Quality",
+      "tagline": "Two agents, one resource, zero coordination. Race conditions aren't just for code.",
+      "failure_mode": "Two agents are working in parallel on adjacent problems. Each assumes it has\nexclusive access to a shared resource — a customer record, a calendar slot, a\nticket queue. They both commit conflicting updates within the same second. Or one\nagent emits output that the other treats as a trusted instruction without realizing\nit was generated by a peer. The system state becomes incoherent and the failure\ncascades.\n",
+      "verification": [
+        {
+          "question": "When multiple agents access shared resources, is there a coordination layer (locks, queues, transactional commits, conflict-resolution rules) that prevents race conditions and inconsistent writes?",
+          "weight": 5
+        },
+        {
+          "question": "Are messages between agents cryptographically or structurally distinguishable from user or external inputs, so no agent treats peer output as a user instruction?",
+          "weight": 5
+        }
+      ],
+      "checklist": [
+        "Shared resources (CRM records, tickets, calendars, queues) are accessed through a single coordination layer with optimistic or pessimistic locking.",
+        "Conflict resolution rules are declared in advance; the last writer does not silently win.",
+        "Agent-to-agent messages carry an explicit sender identity, trust level, and message type that cannot be forged from user input.",
+        "An agent never escalates its trust level based on peer agent output alone; cross-agent instructions that widen scope require human approval.",
+        "Orchestration enforces a DAG or workflow on multi-agent interactions; free-form agent-agent chat is not permitted for high-stakes actions.",
+        "Loop detection halts runaway inter-agent conversations at a defined turn count or cost threshold.",
+        "Observability extends across agents; a single trace ID follows a task end-to-end, not just within one agent's boundary."
+      ],
+      "common_pitfalls": [
+        "Assuming agents will \"figure it out\" between themselves. Coordination requires explicit rules, not emergent behavior.",
+        "Passing structured state via natural language between agents. Messages get summarized, details get lost, and one agent's \"done\" becomes another agent's \"go do more.\"",
+        "No loop detector. Two polite agents can ping-pong for hundreds of turns before a human notices."
+      ],
+      "related": [
+        "human-in-the-loop",
+        "cost-controls",
+        "evaluation-testing"
+      ],
+      "site_url": "https://goclawproof.com/checks/multi-agent-coordination"
+    }
+  ]
+}

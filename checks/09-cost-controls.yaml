@@ -1,0 +1,39 @@
+id: "09"
+slug: cost-controls
+title: Cost Controls & Rate Limiting
+category: Operations
+tagline: A runaway loop at 3AM. No spending cap. Monday morning surprise.
+
+failure_mode: |
+  An agent enters a loop — maybe a tool call fails and triggers a retry, maybe two
+  agents are calling each other, maybe a user input leads it into a recursive
+  clarification cycle. By the time anyone notices, the LLM bill has grown by a factor
+  of a thousand, rate limits on the downstream API are exhausted, and legitimate
+  traffic is being rejected. The fix is easy. Preventing it was easier.
+
+verification:
+  - question: Is there a hard spending cap, enforced at the orchestration layer, that halts the agent when daily/hourly cost crosses a declared threshold?
+    weight: 5
+  - question: Are per-agent and per-user rate limits enforced independently of the LLM provider's own limits, with alerts firing before limits are hit?
+    weight: 5
+
+checklist:
+  - Per-agent and per-user token / call / EUR budgets are defined and enforced at the orchestration layer, not relied on at the provider.
+  - A circuit breaker trips when a single conversation exceeds N turns or M tokens and forces escalation to a human.
+  - Retries use exponential backoff with a max-retry cap; no unbounded retry loops.
+  - Agent-to-agent calls have a separate, stricter budget to prevent loop amplification.
+  - Cost alerts fire at 50%, 75%, 90% of daily budget to a channel humans actually watch.
+  - Rate limits are tested under synthetic load before production.
+  - A daily cost report summarizes spend by agent, by user, by tool, so anomalies surface within 24 hours.
+
+common_pitfalls:
+  - Relying on the LLM provider's rate limits as the cost control. Provider limits protect the provider, not your wallet.
+  - No per-user cap. A single abusive or stuck user can consume the entire daily budget before anyone notices.
+  - Alerts without a human watching them. The circuit breaker, not the alert, is the enforcement; the alert is just the notification.
+
+related:
+  - rollback-kill-switches
+  - multi-agent-coordination
+  - tool-permissions
+
+site_url: https://goclawproof.com/checks/cost-controls

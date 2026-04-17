@@ -1,0 +1,39 @@
+id: "04"
+slug: human-in-the-loop
+title: Human-in-the-Loop & Escalation Paths
+category: Governance
+tagline: When should an agent stop and ask? Define the boundaries before production.
+
+failure_mode: |
+  An agent handles a high-stakes case autonomously because no escalation threshold was
+  defined. Weeks later, a regulator, a customer, or a lawyer asks why a human did not
+  review it. The answer — "the agent did not flag it" — is not an answer. The failure
+  was not the agent's judgment; the failure was the absence of a policy telling the
+  agent when its judgment should yield to a human.
+
+verification:
+  - question: For every agent capability, is there a declared threshold (financial, legal, reputational, confidence-based) above which the agent must pause for human approval?
+    weight: 5
+  - question: Is the escalation path itself tested — does a real human actually receive, review, and either approve or deny the pause within the declared SLA?
+    weight: 5
+
+checklist:
+  - Every agent capability has a documented escalation threshold (e.g., transactions >= X EUR, any legal-adjacent action, confidence < Y).
+  - Escalation reaches a named channel (Slack, ticket, pager) with the agent's reasoning and proposed action attached.
+  - A service-level agreement is declared (e.g., "95% of escalations resolved within 30 minutes") and monitored.
+  - Approvers have a one-click approve/deny UI, not a free-form instruction box that reopens the full autonomy surface.
+  - Denied escalations produce a feedback loop that updates thresholds or system prompts for similar future cases.
+  - Escalations that time out default to the safe action (deny, hold, queue) — never the permissive action.
+  - Out-of-hours escalation paths exist (on-call rotation, regional routing, or documented next-business-day hold).
+
+common_pitfalls:
+  - Defining thresholds but no reviewer staffing. An escalation channel nobody watches is not governance.
+  - Using "low confidence" as the only escalation trigger. Agents can be confidently wrong; threshold-based triggers (financial, legal) are more robust.
+  - Allowing approvers to issue free-form instructions to the agent on approval. This reopens the attack surface the escalation was meant to close.
+
+related:
+  - rollback-kill-switches
+  - multi-agent-coordination
+  - tool-permissions
+
+site_url: https://goclawproof.com/checks/human-in-the-loop

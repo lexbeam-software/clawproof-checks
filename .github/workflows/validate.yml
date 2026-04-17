@@ -1,0 +1,79 @@
+name: Validate checks
+
+on:
+  pull_request:
+    paths:
+      - 'checks/**'
+      - 'skills/clawproof-audit/checks.json'
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install pyyaml
+
+      - name: Validate YAML syntax
+        run: |
+          for f in checks/*.yaml; do
+            python -c "import yaml; yaml.safe_load(open('$f'))" || exit 1
+          done
+
+      - name: Validate schema
+        run: |
+          python <<'EOF'
+          import yaml, glob, sys
+
+          required_fields = {'id', 'slug', 'title', 'category', 'tagline',
+                             'failure_mode', 'verification', 'checklist',
+                             'common_pitfalls', 'related', 'site_url'}
+          valid_categories = {'Security', 'Governance', 'Operations', 'Quality'}
+
+          errors = []
+          for path in sorted(glob.glob('checks/*.yaml')):
+              d = yaml.safe_load(open(path))
+              missing = required_fields - set(d.keys())
+              if missing:
+                  errors.append(f'{path}: missing fields {missing}')
+              if d.get('category') not in valid_categories:
+                  errors.append(f'{path}: invalid category {d.get("category")!r}')
+              if len(d.get('verification', [])) != 2:
+                  errors.append(f'{path}: must have exactly 2 verification questions')
+              if sum(v.get('weight', 0) for v in d.get('verification', [])) != 10:
+                  errors.append(f'{path}: verification weights must sum to 10')
+              if len(d.get('common_pitfalls', [])) != 3:
+                  errors.append(f'{path}: must have exactly 3 common_pitfalls')
+
+          if errors:
+              for e in errors:
+                  print(e, file=sys.stderr)
+              sys.exit(1)
+          print(f'OK — {len(glob.glob("checks/*.yaml"))} checks validated')
+          EOF
+
+      - name: Verify checks.json is in sync
+        run: |
+          python <<'EOF'
+          import yaml, json, glob
+          checks = [yaml.safe_load(open(p)) for p in sorted(glob.glob('checks/*.yaml'))]
+          expected = {
+              'version': '1.0.0',
+              'source': 'https://github.com/PicoWorx/clawproof-checks',
+              'license': 'MIT',
+              'count': len(checks),
+              'checks': checks,
+          }
+          actual = json.load(open('skills/clawproof-audit/checks.json'))
+          if actual != expected:
+              print('ERROR: skills/clawproof-audit/checks.json is out of sync with checks/*.yaml')
+              print('Run: python3 -c "..." to regenerate')
+              exit(1)
+          print('OK — checks.json in sync')
+          EOF

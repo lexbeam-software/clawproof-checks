@@ -1,0 +1,39 @@
+id: "02"
+slug: logging-audit-trails
+title: Logging & Audit Trails
+category: Quality
+tagline: When something breaks, can you trace what happened, why, and who approved it?
+
+failure_mode: |
+  An agent does something surprising in production. A user complains. The team tries
+  to reconstruct what the agent saw, what it chose, what tools it called, and in what
+  order. The logs contain only the final API calls. There is no record of the prompt,
+  the retrieved context, the tool selection reasoning, or the alternatives the agent
+  considered and rejected. The incident becomes unsolvable.
+
+verification:
+  - question: Does every agent interaction produce a structured log entry that captures the input, retrieved context, tool calls with parameters, tool results, and final output?
+    weight: 5
+  - question: Are logs tamper-evident (append-only, signed, or in an audit-grade store) and retained long enough to support regulatory or incident investigations?
+    weight: 5
+
+checklist:
+  - Each turn of the agent produces one structured log record with a correlation ID tying prompt, retrieval, tool calls, and output together.
+  - Tool call parameters are captured in full; tool results are captured or hashed with a pointer to the source if large.
+  - Personally identifiable information is redacted or tokenized before logging, not removed after the fact.
+  - Logs are shipped off-host to an append-only store (S3 with object lock, immudb, or equivalent).
+  - Retention matches the longest of compliance requirements, incident-investigation needs, and model-evaluation replay windows.
+  - A sample incident is regularly reconstructed from logs alone to prove the trail is sufficient.
+  - Log schema is versioned; breaking changes are tracked so old logs remain queryable.
+
+common_pitfalls:
+  - Logging only the final API response and losing the agent's reasoning and tool-selection steps.
+  - Storing logs in the same database the agent can write to — an agent incident can then overwrite its own evidence.
+  - Retaining logs forever with PII intact; GDPR / privacy laws require retention limits and data-subject deletion paths.
+
+related:
+  - evaluation-testing
+  - human-in-the-loop
+  - data-boundaries
+
+site_url: https://goclawproof.com/checks/logging-audit-trails

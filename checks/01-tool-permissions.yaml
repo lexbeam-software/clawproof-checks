@@ -1,0 +1,40 @@
+id: "01"
+slug: tool-permissions
+title: Tool Permissions & Least Privilege
+category: Security
+tagline: Your agent starts with read access. Within a month, it has keys to everything.
+
+failure_mode: |
+  Agents accumulate permissions over time. A read-only Stripe key becomes a broader
+  refund-capable key because a developer needed to unblock a feature. Nobody updates
+  the permission manifest. The agent is now one plausible-sounding prompt away from
+  authorizing transfers it was never supposed to touch, and the audit trail will show
+  it acting well within its granted scope the entire time.
+
+verification:
+  - question: Is every tool permission declared in a version-controlled manifest and enforced at the agent runtime, not just at the downstream API?
+    weight: 5
+  - question: Is there a recurring audit (weekly or monthly) that compares granted permissions against actual usage, and revokes unused ones?
+    weight: 5
+
+checklist:
+  - Permission manifest lives in version control and requires reviewer approval for changes.
+  - API keys are scoped to the minimum required operations; no wildcard or admin keys.
+  - A runtime permission gateway validates every tool call against the manifest before execution.
+  - Denied-tool patterns are listed explicitly, not just omitted, as defense in depth.
+  - Rate limits are enforced per-tool, not only per-agent.
+  - Short-lived tokens (<= 15 minutes) are used wherever the downstream API supports them.
+  - Permission changes trigger alerts to a security channel and require separate approval from the feature PR.
+  - Quarterly audit of granted vs. used permissions; revoke anything unused for 30+ days.
+
+common_pitfalls:
+  - Treating the manifest as documentation instead of enforcement. If the runtime does not block what the manifest forbids, you have a policy document, not a control.
+  - Scoping at the service level ("Stripe access") instead of the operation level ("Stripe charges.retrieve with read-only rate limit").
+  - Skipping explicit deny rules because "anything not in the allow list is denied" — until someone adds a new tool integration and forgets the manifest.
+
+related:
+  - prompt-injection
+  - secrets-management
+  - human-in-the-loop
+
+site_url: https://goclawproof.com/checks/tool-permissions

@@ -1,0 +1,39 @@
+id: "03"
+slug: prompt-injection
+title: Prompt Injection & Data Exfiltration
+category: Security
+tagline: Untrusted content in, secrets out. The attack surface nobody tests.
+
+failure_mode: |
+  An agent ingests content it did not author — a support ticket, a PDF, a webpage, an
+  email — and that content contains instructions disguised as data. The agent follows
+  the instructions. It exfiltrates secrets via a tool call to an attacker-controlled
+  URL, or it takes privileged actions on behalf of the attacker. The team only
+  discovers the breach when the downstream damage becomes visible.
+
+verification:
+  - question: Is every piece of untrusted content (user input, retrieved documents, tool outputs from external sources) treated as data, not as instructions, with clear delimiters and system-prompt boundaries?
+    weight: 5
+  - question: Are outbound tool calls constrained so the agent cannot send data to arbitrary destinations (no open URL fetch, no arbitrary email recipients, no free-form webhooks)?
+    weight: 5
+
+checklist:
+  - System prompts explicitly instruct the agent to ignore instructions inside user/retrieved content.
+  - Untrusted content is wrapped in clearly delimited blocks (e.g., XML tags, triple backticks) with instructions to never treat the content as commands.
+  - Outbound tool destinations are allowlisted; no free-form URL or email-recipient parameters.
+  - A content filter scans agent outputs for likely data exfiltration patterns (base64 blobs to external URLs, unexpected recipient lists).
+  - A red-team prompt suite runs in CI; every release is smoke-tested against known injection patterns.
+  - User-facing tools that accept files run the file through a sanitizer and a size limit before handing to the agent.
+  - High-risk actions (transfers, deletions, outbound emails to new recipients) require human approval regardless of agent confidence.
+
+common_pitfalls:
+  - Assuming a strong system prompt is sufficient. Determined injections defeat prompt-only defenses; destination allowlists are the actual enforcement layer.
+  - Running a prompt-injection test suite once at launch and never again. Model upgrades change attack surface; the suite must run on every release.
+  - Treating internal documents as "trusted." Any document written by a human user of the system is untrusted by definition.
+
+related:
+  - tool-permissions
+  - secrets-management
+  - data-boundaries
+
+site_url: https://goclawproof.com/checks/prompt-injection

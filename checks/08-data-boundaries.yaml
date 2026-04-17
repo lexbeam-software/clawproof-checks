@@ -1,0 +1,39 @@
+id: "08"
+slug: data-boundaries
+title: Data Boundaries & RAG Governance
+category: Governance
+tagline: Your agent can read everything it retrieves. Can it read everything it should?
+
+failure_mode: |
+  A RAG pipeline indexes a shared drive. The index includes HR files, M&A working
+  documents, legal hold material, and customer PII. An employee asks the agent a
+  benign question; the retrieval step pulls a paragraph from a confidential document
+  and feeds it into the answer. The agent happily summarizes it. The employee now
+  knows something they were never authorized to see.
+
+verification:
+  - question: Does the retrieval layer enforce access-control at query time (row-level security, per-user corpora, ACL filters) — not just at the UI layer of the source system?
+    weight: 5
+  - question: Is the RAG corpus audited for data classes (PII, PHI, trade secrets, legal-privileged, retention-limited) with a declared policy for each, including what may not be indexed at all?
+    weight: 5
+
+checklist:
+  - Every document in the retrieval index carries metadata for classification, owner, source system, and original ACLs.
+  - The retrieval query filters by the end user's identity and groups; no query returns documents the user cannot access in the source system.
+  - Re-indexing runs on a schedule that keeps the index within an acceptable freshness window for permission changes (minutes to hours, not days).
+  - A quarantine list keeps specific document types (HR investigations, legal holds, live M&A) out of the index entirely.
+  - Retention policies are mirrored in the index — when the source is deleted or expires, the index entry is too.
+  - PII in retrieved passages is redacted or tokenized before being passed to the model, where feasible.
+  - An audit log records which documents were retrieved for which user on which query, sufficient to answer "who saw what, when."
+
+common_pitfalls:
+  - Relying on the source system's ACLs without replicating them into the index; the agent query bypasses the source UI and its permission checks.
+  - Indexing "everything" because filtering is hard; sensitive document classes leak via embeddings even if the final answer omits them.
+  - Freshness lag on permission updates: a fired employee's permissions are revoked in the source, but the vector index still returns documents from their old access for hours or days.
+
+related:
+  - prompt-injection
+  - logging-audit-trails
+  - human-in-the-loop
+
+site_url: https://goclawproof.com/checks/data-boundaries

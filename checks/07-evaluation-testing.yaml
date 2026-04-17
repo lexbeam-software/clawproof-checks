@@ -1,0 +1,39 @@
+id: "07"
+slug: evaluation-testing
+title: Evaluation & Regression Testing
+category: Quality
+tagline: You upgrade the model. Agent behavior changes. No tests caught it.
+
+failure_mode: |
+  A new model version ships. Benchmarks are slightly better on paper. The team upgrades
+  in production. A week later, support tickets reveal the agent is now refusing valid
+  requests, or hallucinating on a specific edge case, or subtly changing its tone in a
+  way that violates the brand. There was no regression suite that would have caught
+  any of this before the rollout.
+
+verification:
+  - question: Is there a versioned evaluation suite with representative inputs, expected behaviors, and automated grading that runs on every model or prompt change?
+    weight: 5
+  - question: Do production releases require the eval suite to pass with no regressions against the previous version, not just absolute score thresholds?
+    weight: 5
+
+checklist:
+  - Eval set contains at least 50 representative inputs covering the happy path, edge cases, adversarial inputs, and known-failure modes.
+  - Each eval has a clearly defined grading criterion (exact match, LLM-judged rubric, regex, structural check) — not just "looks good to the engineer."
+  - The suite runs automatically on every prompt change, tool change, model change, and on a weekly schedule against production.
+  - Regression gating compares new version against previous version; no single eval may degrade by more than a defined threshold without sign-off.
+  - Failed evals produce concrete diffs (input, expected, actual) that make root cause obvious.
+  - Eval dataset grows from production incidents; each incident converts into a new eval that would have caught it.
+  - A rotating subset of production traffic is shadow-tested against candidate versions before any rollout.
+
+common_pitfalls:
+  - A flat "94%" headline number that is not compared against the previous version can hide dozens of regressions offset by dozens of improvements.
+  - Using the same LLM as both subject and judge without considering self-consistency bias; use a different model or a deterministic grader where possible.
+  - Eval dataset written once and never updated; production drift means the suite stops reflecting real traffic within weeks.
+
+related:
+  - logging-audit-trails
+  - data-boundaries
+  - multi-agent-coordination
+
+site_url: https://goclawproof.com/checks/evaluation-testing

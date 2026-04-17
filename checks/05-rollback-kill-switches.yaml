@@ -1,0 +1,39 @@
+id: "05"
+slug: rollback-kill-switches
+title: Rollback, Kill-Switches & Incident Response
+category: Operations
+tagline: Can you stop your agent in 30 seconds? If not, you're not production-ready.
+
+failure_mode: |
+  An agent starts producing harmful output at 3 AM. The on-call engineer tries to stop
+  it and discovers there is no single button. Disabling it requires revoking API keys,
+  pushing a config change, waiting for a deploy, and hoping the in-flight requests
+  finish. By the time the agent is actually silent, the incident has been running for
+  45 minutes and the damage is done.
+
+verification:
+  - question: Is there a single documented action (one button, one CLI command, one feature flag) that stops the agent from taking any new action within 30 seconds?
+    weight: 5
+  - question: For each destructive or public-facing capability, is there a reversible path — dry-run mode, staging replay, compensating transaction — that can undo recent agent actions?
+    weight: 5
+
+checklist:
+  - A kill switch exists at the orchestration layer (feature flag, circuit breaker, or config switch) and halts new agent runs without requiring a deploy.
+  - The kill switch is tested on a regular cadence (monthly); time-to-halt is measured and trended.
+  - In-flight agent actions have an idempotency key and a cancellation path where the downstream API supports it.
+  - Destructive actions have a dry-run mode toggled by a flag so you can prove what an agent would do before it does it.
+  - An incident runbook lives in the same repo as the agent; on-call knows where to find it without opening the browser.
+  - Rollback is rehearsed; the team has actually pressed the button in a drill, not just designed the button.
+  - Public-facing outputs (emails, posts, payments) have a retraction path — compensating message, reversal, or customer-service workflow.
+
+common_pitfalls:
+  - Kill switch lives in a different repo or team's infrastructure, making it slow to activate in a real incident.
+  - The so-called kill switch really just revokes the API key, which takes effect only for new requests and leaves in-flight actions running.
+  - No rehearsal. The switch exists on paper but has never been pulled; the first time is during the real incident.
+
+related:
+  - human-in-the-loop
+  - cost-controls
+  - logging-audit-trails
+
+site_url: https://goclawproof.com/checks/rollback-kill-switches
