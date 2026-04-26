@@ -17,7 +17,7 @@ def build() -> int:
 
     out = {
         "version": "1.0.0",
-        "source": "https://github.com/PicoWorx/clawproof-checks",
+        "source": "https://github.com/lexbeam-software/clawproof-checks",
         "license": "MIT",
         "count": len(checks),
         "checks": checks,

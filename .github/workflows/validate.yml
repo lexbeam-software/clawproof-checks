@@ -65,7 +65,7 @@ jobs:
           checks = [yaml.safe_load(open(p)) for p in sorted(glob.glob('checks/*.yaml'))]
           expected = {
               'version': '1.0.0',
-              'source': 'https://github.com/PicoWorx/clawproof-checks',
+              'source': 'https://github.com/lexbeam-software/clawproof-checks',
               'license': 'MIT',
               'count': len(checks),
               'checks': checks,

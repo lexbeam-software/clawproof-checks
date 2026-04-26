@@ -84,4 +84,4 @@ Checks where the audit could not reach a confident score, and what additional ma
 
 ---
 
-*Generated using the Clawproof audit skill. Checks: https://github.com/PicoWorx/clawproof-checks (MIT).*
+*Generated using the Clawproof audit skill. Checks: https://github.com/lexbeam-software/clawproof-checks (MIT).*

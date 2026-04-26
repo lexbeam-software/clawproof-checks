@@ -34,7 +34,7 @@ A packaged skill is included at [`skills/clawproof-audit/`](skills/clawproof-aud
 
 ```bash
 # Clone into your project's skills directory
-git clone https://github.com/PicoWorx/clawproof-checks.git /tmp/clawproof
+git clone https://github.com/lexbeam-software/clawproof-checks.git /tmp/clawproof
 cp -r /tmp/clawproof/skills/clawproof-audit ./.claude/skills/
 
 # In Claude Code:
@@ -52,7 +52,7 @@ The skill produces a scored audit report (0-100) with prioritized remediation, l
 Every check is also bundled into a single JSON file for programmatic consumption:
 
 ```bash
-curl -O https://raw.githubusercontent.com/PicoWorx/clawproof-checks/main/skills/clawproof-audit/checks.json
+curl -O https://raw.githubusercontent.com/lexbeam-software/clawproof-checks/main/skills/clawproof-audit/checks.json
 ```
 
 Schema: see [`checks/SCHEMA.md`](checks/SCHEMA.md).
