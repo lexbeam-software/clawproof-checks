@@ -83,6 +83,6 @@ MIT. Use these checks in commercial products, internal tooling, client deliverab
 
 ---
 
-Maintained by [Werner Plutat](https://www.linkedin.com/in/wplu/) / [Lexbeam Software](https://lexbeam.com).
+Maintained by [Werner Plutat](https://www.linkedin.com/in/wplu/) / [Lexbeam Software](https://www.lexbeam.com).
 
 For enterprise rollout support in DACH: [www.agentklar.de](https://www.agentklar.de).
