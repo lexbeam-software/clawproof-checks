@@ -4,8 +4,8 @@
 
 Ten opinionated checks. One checklist per check. One verification pass your agent either passes, partially passes, or fails. No theory, no tooling lock-in, no vendor dependency. Built from running agents in production every day.
 
-→ Full writeups: [goclawproof.com/checks](https://goclawproof.com/checks)
-→ Interactive assessment: [goclawproof.com/assessment](https://goclawproof.com/assessment)
+→ Full writeups: [www.goclawproof.com/checks](https://www.goclawproof.com/checks)
+→ Interactive assessment: [www.goclawproof.com/assessment](https://www.goclawproof.com/assessment)
 
 ---
 
@@ -85,4 +85,4 @@ MIT. Use these checks in commercial products, internal tooling, client deliverab
 
 Maintained by [Werner Plutat](https://www.linkedin.com/in/wplu/) / [Lexbeam Software](https://lexbeam.com).
 
-For enterprise rollout support in DACH: [agentklar.de](https://agentklar.de).
+For enterprise rollout support in DACH: [www.agentklar.de](https://www.agentklar.de).

@@ -41,7 +41,7 @@
         "secrets-management",
         "human-in-the-loop"
       ],
-      "site_url": "https://goclawproof.com/checks/tool-permissions"
+      "site_url": "https://www.goclawproof.com/checks/tool-permissions"
     },
     {
       "id": "02",
@@ -79,7 +79,7 @@
         "human-in-the-loop",
         "data-boundaries"
       ],
-      "site_url": "https://goclawproof.com/checks/logging-audit-trails"
+      "site_url": "https://www.goclawproof.com/checks/logging-audit-trails"
     },
     {
       "id": "03",
@@ -117,7 +117,7 @@
         "secrets-management",
         "data-boundaries"
       ],
-      "site_url": "https://goclawproof.com/checks/prompt-injection"
+      "site_url": "https://www.goclawproof.com/checks/prompt-injection"
     },
     {
       "id": "04",
@@ -155,7 +155,7 @@
         "multi-agent-coordination",
         "tool-permissions"
       ],
-      "site_url": "https://goclawproof.com/checks/human-in-the-loop"
+      "site_url": "https://www.goclawproof.com/checks/human-in-the-loop"
     },
     {
       "id": "05",
@@ -193,7 +193,7 @@
         "cost-controls",
         "logging-audit-trails"
       ],
-      "site_url": "https://goclawproof.com/checks/rollback-kill-switches"
+      "site_url": "https://www.goclawproof.com/checks/rollback-kill-switches"
     },
     {
       "id": "06",
@@ -231,7 +231,7 @@
         "prompt-injection",
         "logging-audit-trails"
       ],
-      "site_url": "https://goclawproof.com/checks/secrets-management"
+      "site_url": "https://www.goclawproof.com/checks/secrets-management"
     },
     {
       "id": "07",
@@ -269,7 +269,7 @@
         "data-boundaries",
         "multi-agent-coordination"
       ],
-      "site_url": "https://goclawproof.com/checks/evaluation-testing"
+      "site_url": "https://www.goclawproof.com/checks/evaluation-testing"
     },
     {
       "id": "08",
@@ -309,7 +309,7 @@
         "logging-audit-trails",
         "human-in-the-loop"
       ],
-      "site_url": "https://goclawproof.com/checks/data-boundaries"
+      "site_url": "https://www.goclawproof.com/checks/data-boundaries"
     },
     {
       "id": "09",
@@ -347,7 +347,7 @@
         "multi-agent-coordination",
         "tool-permissions"
       ],
-      "site_url": "https://goclawproof.com/checks/cost-controls"
+      "site_url": "https://www.goclawproof.com/checks/cost-controls"
     },
     {
       "id": "10",
@@ -385,7 +385,7 @@
         "cost-controls",
         "evaluation-testing"
       ],
-      "site_url": "https://goclawproof.com/checks/multi-agent-coordination"
+      "site_url": "https://www.goclawproof.com/checks/multi-agent-coordination"
     }
   ]
 }

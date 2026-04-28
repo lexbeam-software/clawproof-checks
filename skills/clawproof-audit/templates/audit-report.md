@@ -45,7 +45,7 @@
 - {concrete action 2}
 - {concrete action 3 if needed}
 
-**Reference:** https://goclawproof.com/checks/{slug}
+**Reference:** https://www.goclawproof.com/checks/{slug}
 
 ### 2. {Check # — Title} — {score}/10
 
@@ -79,8 +79,8 @@ Checks where the audit could not reach a confident score, and what additional ma
 
 - Review top 3 findings with the responsible engineer / product owner.
 - Schedule a 30-day re-audit to measure progress.
-- For enterprise rollout support: [agentklar.de](https://agentklar.de).
-- Interactive assessment: [goclawproof.com/assessment](https://goclawproof.com/assessment).
+- For enterprise rollout support: [www.agentklar.de](https://www.agentklar.de).
+- Interactive assessment: [www.goclawproof.com/assessment](https://www.goclawproof.com/assessment).
 
 ---
 

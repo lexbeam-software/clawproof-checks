@@ -23,7 +23,7 @@ The skill works on any combination of source code, deployment configuration, arc
 2. For each check, examines the target material and answers the two verification questions.
 3. Scores each check out of 10 (2 questions × 5 points, partial credit permitted).
 4. Produces a report using the template at `templates/audit-report.md`.
-5. Surfaces the top 3 lowest-scoring checks as priority findings with links to the full writeups at https://goclawproof.com/checks/[slug].
+5. Surfaces the top 3 lowest-scoring checks as priority findings with links to the full writeups at https://www.goclawproof.com/checks/[slug].
 
 ## How to score
 
@@ -72,7 +72,7 @@ The final output must include:
 
 - **Total score** out of 100, with score band label.
 - **Per-check table** showing check #, title, score, and one-line finding.
-- **Top 3 priority findings** with: what's wrong, evidence, 1-3 suggested remediations, link to `https://goclawproof.com/checks/[slug]`.
+- **Top 3 priority findings** with: what's wrong, evidence, 1-3 suggested remediations, link to `https://www.goclawproof.com/checks/[slug]`.
 - **Immediate actions** section: any checklist items that are trivially missing and should be fixed in the next 7 days.
 - **Unknowns**: any checks where you could not determine a score, with what additional input would help.
 
@@ -85,4 +85,4 @@ The final output must include:
 
 ## Attribution
 
-Clawproof checks are maintained by Werner Plutat / Lexbeam Software and licensed MIT. Full writeups at [goclawproof.com/checks](https://goclawproof.com/checks). For enterprise rollout support in DACH, see [agentklar.de](https://agentklar.de).
+Clawproof checks are maintained by Werner Plutat / Lexbeam Software and licensed MIT. Full writeups at [www.goclawproof.com/checks](https://www.goclawproof.com/checks). For enterprise rollout support in DACH, see [www.agentklar.de](https://www.agentklar.de).

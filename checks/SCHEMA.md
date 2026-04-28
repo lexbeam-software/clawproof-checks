@@ -20,7 +20,7 @@ common_pitfalls:                # exactly 3 entries
   - string
 related:                        # 0-4 slugs, all must resolve to an existing check
   - string
-site_url: string                # https://goclawproof.com/checks/<slug>
+site_url: string                # https://www.goclawproof.com/checks/<slug>
 ```
 
 ## Scoring convention
