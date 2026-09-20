@@ -12,9 +12,11 @@ failure_mode: |
   it acting well within its granted scope the entire time.
 
 verification:
-  - question: Is every tool permission declared in a version-controlled manifest and enforced at the agent runtime, not just at the downstream API?
+  - id: "01a"
+    question: Is every tool permission declared in a version-controlled manifest and enforced at the agent runtime, not just at the downstream API?
     weight: 5
-  - question: Is there a recurring audit (weekly or monthly) that compares granted permissions against actual usage, and revokes unused ones?
+  - id: "01b"
+    question: Is there a recurring audit (weekly or monthly) that compares granted permissions against actual usage, and revokes unused ones?
     weight: 5
 
 checklist:

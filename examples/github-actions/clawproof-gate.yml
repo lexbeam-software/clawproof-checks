@@ -1,0 +1,23 @@
+name: Clawproof production gate
+
+on:
+  pull_request:
+
+jobs:
+  production-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch the Clawproof gate
+        uses: actions/checkout@v4
+        with:
+          repository: lexbeam-software/clawproof-checks
+          path: .clawproof
+      - name: Evaluate the declared controls
+        run: .clawproof/bin/clawproof gate clawproof-gate.json --format markdown --output clawproof-report.md
+      - name: Upload the evidence report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clawproof-report
+          path: clawproof-report.md

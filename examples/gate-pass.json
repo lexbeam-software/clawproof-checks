@@ -1,0 +1,26 @@
+{
+  "policy_version": "1.0.0",
+  "target": "example-agent",
+  "answers": {
+    "01a": {"value": "yes", "evidence": ["config/tool-policy.json"]},
+    "01b": {"value": "yes", "evidence": ["runbooks/permission-review.md"]},
+    "02a": {"value": "yes", "evidence": ["observability/trace-schema.json"]},
+    "02b": {"value": "yes", "evidence": ["infra/audit-store.tf"]},
+    "03a": {"value": "yes", "evidence": ["tests/prompt-injection.spec.ts"]},
+    "03b": {"value": "yes", "evidence": ["config/outbound-allowlist.json"]},
+    "04a": {"value": "yes", "evidence": ["config/approval-policy.json"]},
+    "04b": {"value": "yes", "evidence": ["runbooks/approval-drill.md"]},
+    "05a": {"value": "yes", "evidence": ["runbooks/kill-switch.md"]},
+    "05b": {"value": "yes", "evidence": ["tests/rollback-drill.md"]},
+    "06a": {"value": "yes", "evidence": ["infra/secrets.tf"]},
+    "06b": {"value": "yes", "evidence": [".github/workflows/secret-scan.yml"]},
+    "07a": {"value": "yes", "evidence": ["evals/suite.json"]},
+    "07b": {"value": "yes", "evidence": [".github/workflows/evals.yml"]},
+    "08a": {"value": "yes", "evidence": ["rag/acl-filter.ts"]},
+    "08b": {"value": "yes", "evidence": ["docs/data-policy.md"]},
+    "09a": {"value": "yes", "evidence": ["config/budget-policy.json"]},
+    "09b": {"value": "yes", "evidence": ["config/rate-limits.json"]},
+    "10a": {"value": "yes", "evidence": ["orchestrator/locks.ts"]},
+    "10b": {"value": "yes", "evidence": ["schemas/agent-message.json"]}
+  }
+}

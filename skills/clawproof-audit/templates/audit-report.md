@@ -11,6 +11,10 @@
 
 **Clawproof Score: {total}/100 — {band}**
 
+**Production Gate: {PASS | REVIEW | BLOCK}** (policy {version})
+
+{gate reasons: critical blockers, unknowns, partial controls, or missing evidence references}
+
 {one-paragraph executive summary: what this agent does well, what it does poorly, the single biggest risk}
 
 ---
@@ -84,4 +88,4 @@ Checks where the audit could not reach a confident score, and what additional ma
 
 ---
 
-*Generated using the Clawproof audit skill. Checks: https://github.com/lexbeam-software/clawproof-checks (MIT).*
+*Generated using the Clawproof audit skill. This report evaluates supplied materials and evidence references; it is not certification of a production environment. Checks: https://github.com/lexbeam-software/clawproof-checks (MIT).*

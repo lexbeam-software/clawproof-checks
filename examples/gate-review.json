@@ -1,0 +1,16 @@
+{
+  "policy_version": "1.0.0",
+  "target": "agent-needing-review",
+  "answers": {
+    "01a": {"value": "yes", "evidence": ["config/tool-policy.json"]},
+    "01b": {"value": "partial", "evidence": ["runbooks/permission-review-draft.md"]},
+    "02a": {"value": "yes", "evidence": []},
+    "03a": {"value": "yes", "evidence": ["tests/prompt-injection.spec.ts"]},
+    "03b": {"value": "yes", "evidence": ["config/outbound-allowlist.json"]},
+    "04a": {"value": "yes", "evidence": ["config/approval-policy.json"]},
+    "05a": {"value": "yes", "evidence": ["runbooks/kill-switch.md"]},
+    "06a": {"value": "yes", "evidence": ["infra/secrets.tf"]},
+    "08a": {"value": "yes", "evidence": ["rag/acl-filter.ts"]},
+    "09a": {"value": "yes", "evidence": ["config/budget-policy.json"]}
+  }
+}

@@ -12,9 +12,11 @@ failure_mode: |
   considered and rejected. The incident becomes unsolvable.
 
 verification:
-  - question: Does every agent interaction produce a structured log entry that captures the input, retrieved context, tool calls with parameters, tool results, and final output?
+  - id: "02a"
+    question: Does every agent interaction produce a structured log entry that captures the input, retrieved context, tool calls with parameters, tool results, and final output?
     weight: 5
-  - question: Are logs tamper-evident (append-only, signed, or in an audit-grade store) and retained long enough to support regulatory or incident investigations?
+  - id: "02b"
+    question: Are logs tamper-evident (append-only, signed, or in an audit-grade store) and retained long enough to support regulatory or incident investigations?
     weight: 5
 
 checklist:

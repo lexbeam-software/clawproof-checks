@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Clawproof Production Gate",
+  "version": "1.0.0",
+  "question_ids": [
+    "01a", "01b", "02a", "02b", "03a", "03b", "04a", "04b", "05a", "05b",
+    "06a", "06b", "07a", "07b", "08a", "08b", "09a", "09b", "10a", "10b"
+  ],
+  "questions": {
+    "01a": "Is every tool permission declared in a version-controlled manifest and enforced at the agent runtime, not just at the downstream API?",
+    "01b": "Is there a recurring audit (weekly or monthly) that compares granted permissions against actual usage, and revokes unused ones?",
+    "02a": "Does every agent interaction produce a structured log entry that captures the input, retrieved context, tool calls with parameters, tool results, and final output?",
+    "02b": "Are logs tamper-evident (append-only, signed, or in an audit-grade store) and retained long enough to support regulatory or incident investigations?",
+    "03a": "Do automated prompt-injection tests verify that untrusted content cannot override trusted instructions or expand tool permissions?",
+    "03b": "Are outbound tool calls constrained so the agent cannot send data to arbitrary destinations (no open URL fetch, no arbitrary email recipients, no free-form webhooks)?",
+    "04a": "For every agent capability, is there a declared threshold (financial, legal, reputational, confidence-based) above which the agent must pause for human approval?",
+    "04b": "Is the escalation path itself tested — does a real human actually receive, review, and either approve or deny the pause within the declared SLA?",
+    "05a": "Is there a single documented action (one button, one CLI command, one feature flag) that stops the agent from taking any new action within 30 seconds?",
+    "05b": "For each destructive or public-facing capability, is there a reversible path — dry-run mode, staging replay, compensating transaction — that can undo recent agent actions?",
+    "06a": "Are all secrets injected via a secret manager (AWS Secrets Manager, Vault, environment of the orchestrator) rather than hardcoded in prompts, configs, or repo files?",
+    "06b": "Is there automated scanning — at commit time and at log-write time — that prevents secrets from leaking into repos, logs, telemetry, or agent outputs?",
+    "07a": "Is there a versioned evaluation suite with representative inputs, expected behaviors, and automated grading that runs on every model or prompt change?",
+    "07b": "Do production releases require the eval suite to pass with no regressions against the previous version, not just absolute score thresholds?",
+    "08a": "Does the retrieval layer enforce access-control at query time (row-level security, per-user corpora, ACL filters) — not just at the UI layer of the source system?",
+    "08b": "Is the RAG corpus audited for data classes (PII, PHI, trade secrets, legal-privileged, retention-limited) with a declared policy for each, including what may not be indexed at all?",
+    "09a": "Is there a hard spending cap, enforced at the orchestration layer, that halts the agent when daily/hourly cost crosses a declared threshold?",
+    "09b": "Are per-agent and per-user rate limits enforced independently of the LLM provider's own limits, with alerts firing before limits are hit?",
+    "10a": "When multiple agents access shared resources, is there a coordination layer (locks, queues, transactional commits, conflict-resolution rules) that prevents race conditions and inconsistent writes?",
+    "10b": "Are messages between agents cryptographically or structurally distinguishable from user or external inputs, so no agent treats peer output as a user instruction?"
+  },
+  "critical_question_ids": ["01a", "03a", "03b", "04a", "05a", "06a", "08a", "09a"],
+  "answer_points": {
+    "yes": 5,
+    "partial": 2,
+    "no": 0,
+    "unknown": 0
+  },
+  "score_bands": [
+    {"id": "at-risk", "label": "At risk", "min": 0, "max": 39},
+    {"id": "foundational", "label": "Foundational", "min": 40, "max": 64},
+    {"id": "controlled-with-gaps", "label": "Controlled with gaps", "min": 65, "max": 84},
+    {"id": "mature-controls", "label": "Mature controls", "min": 85, "max": 100}
+  ],
+  "decision_rules": {
+    "block": "Any critical question answered no.",
+    "review": "Any partial, no, unknown, omitted answer, or yes answer without an evidence reference.",
+    "pass": "Every question answered yes and every answer has at least one evidence reference.",
+    "precedence": "BLOCK takes precedence over REVIEW, which takes precedence over PASS."
+  },
+  "evaluation_rules": {
+    "answers": "Use only the lowercase values yes, partial, no, and unknown.",
+    "unexpected_question_ids": "Reject question ids that are not in question_ids.",
+    "evidence_references": "Require an array of non-empty strings and trim surrounding whitespace.",
+    "omitted_answers": "Normalize omitted answers to unknown and require REVIEW."
+  },
+  "disclaimer": "This gate evaluates declared answers and evidence references. It does not inspect or certify a production environment."
+}

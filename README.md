@@ -2,7 +2,7 @@
 
 **Open-source reliability and governance checks for AI agents.**
 
-Ten opinionated checks. One checklist per check. One verification pass your agent either passes, partially passes, or fails. No theory, no tooling lock-in, no vendor dependency. Built from running agents in production every day.
+Ten opinionated checks plus a deterministic production gate. The coverage score shows where controls are strong or weak. The gate returns `PASS`, `REVIEW`, or `BLOCK` from declared answers and evidence references. No tooling lock-in and no vendor dependency.
 
 → Full writeups: [www.goclawproof.com/checks](https://www.goclawproof.com/checks)
 → Interactive assessment: [www.goclawproof.com/assessment](https://www.goclawproof.com/assessment)
@@ -59,9 +59,36 @@ Schema: see [`checks/SCHEMA.md`](checks/SCHEMA.md).
 
 ---
 
-## Use it as a yardstick
+## Run the production gate
 
-Teams also treat the checks as a pre-production gate. Add them to your agent release checklist; fail a launch if any check scores below 7/10. The YAML is stable enough to diff in CI.
+The CLI uses Python's standard library and sends nothing over the network. Start with
+the example declaration, replace the evidence references with your own, and run it:
+
+```bash
+git clone https://github.com/lexbeam-software/clawproof-checks.git
+cd clawproof-checks
+
+./bin/clawproof gate examples/gate-pass.json --format markdown --target my-agent
+```
+
+Exit codes are stable for CI:
+
+| Exit | Decision | Meaning |
+|---:|---|---|
+| 0 | `PASS` | Every answer is yes and has evidence |
+| 2 | `REVIEW` | A control or evidence reference is incomplete |
+| 3 | `BLOCK` | A critical control explicitly failed |
+| 4 | `INVALID` | The declaration or selected policy fails structural validation |
+
+The score is diagnostic, not the release decision. A critical failure blocks even at
+95/100, and an affirmative claim without an evidence reference cannot produce `PASS`.
+The gate does not open or authenticate those references. See the versioned policy at
+[`policy/clawproof-gate.v1.json`](policy/clawproof-gate.v1.json) and copy the example
+workflow from [`examples/github-actions/clawproof-gate.yml`](examples/github-actions/clawproof-gate.yml).
+
+The gate evaluates what you declare. It does not inspect or certify a production
+environment. Evidence references are included in the report for a human or CI process
+to verify.
 
 ---
 

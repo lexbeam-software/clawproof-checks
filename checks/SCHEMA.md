@@ -10,7 +10,8 @@ category: enum                  # Security | Governance | Operations | Quality
 tagline: string                 # one-line hook, appears on site cards
 failure_mode: string            # 2-3 sentence narrative (block scalar)
 verification:                   # exactly 2 entries, each weight 5 -> total 10
-  - question: string
+  - id: string                  # stable question id, e.g. "01a"
+    question: string
     weight: 5
   - question: string
     weight: 5
@@ -36,7 +37,12 @@ Per check max: 10 points. Total across 10 checks: 100 points.
 
 | Score | Band | Meaning |
 |-------|------|---------|
-| 0-30 | High risk | Do not ship to production |
-| 31-60 | Needs work | Significant gaps before production |
-| 61-80 | Production-ready with caveats | Address top 3 findings |
-| 81-100 | Exemplary | Continuous improvement only |
+| 0-39 | At risk | Basic controls are absent or unverified |
+| 40-64 | Foundational | Some controls exist, with material gaps |
+| 65-84 | Controlled with gaps | Most controls exist, but the gate may still block or require review |
+| 85-100 | Mature controls | Strong coverage; the independent gate decision still applies |
+
+The score describes control coverage. It is not the release decision. The versioned
+production gate in [`policy/clawproof-gate.v1.json`](../policy/clawproof-gate.v1.json)
+returns `PASS`, `REVIEW`, or `BLOCK`. A critical failed control overrides a high
+aggregate score, and missing evidence can never produce `PASS`.

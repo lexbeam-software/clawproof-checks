@@ -12,9 +12,11 @@ failure_mode: |
   knows something they were never authorized to see.
 
 verification:
-  - question: Does the retrieval layer enforce access-control at query time (row-level security, per-user corpora, ACL filters) — not just at the UI layer of the source system?
+  - id: "08a"
+    question: Does the retrieval layer enforce access-control at query time (row-level security, per-user corpora, ACL filters) — not just at the UI layer of the source system?
     weight: 5
-  - question: Is the RAG corpus audited for data classes (PII, PHI, trade secrets, legal-privileged, retention-limited) with a declared policy for each, including what may not be indexed at all?
+  - id: "08b"
+    question: Is the RAG corpus audited for data classes (PII, PHI, trade secrets, legal-privileged, retention-limited) with a declared policy for each, including what may not be indexed at all?
     weight: 5
 
 checklist:

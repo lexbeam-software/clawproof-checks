@@ -13,10 +13,12 @@
       "failure_mode": "Agents accumulate permissions over time. A read-only Stripe key becomes a broader\nrefund-capable key because a developer needed to unblock a feature. Nobody updates\nthe permission manifest. The agent is now one plausible-sounding prompt away from\nauthorizing transfers it was never supposed to touch, and the audit trail will show\nit acting well within its granted scope the entire time.\n",
       "verification": [
         {
+          "id": "01a",
           "question": "Is every tool permission declared in a version-controlled manifest and enforced at the agent runtime, not just at the downstream API?",
           "weight": 5
         },
         {
+          "id": "01b",
           "question": "Is there a recurring audit (weekly or monthly) that compares granted permissions against actual usage, and revokes unused ones?",
           "weight": 5
         }
@@ -52,10 +54,12 @@
       "failure_mode": "An agent does something surprising in production. A user complains. The team tries\nto reconstruct what the agent saw, what it chose, what tools it called, and in what\norder. The logs contain only the final API calls. There is no record of the prompt,\nthe retrieved context, the tool selection reasoning, or the alternatives the agent\nconsidered and rejected. The incident becomes unsolvable.\n",
       "verification": [
         {
+          "id": "02a",
           "question": "Does every agent interaction produce a structured log entry that captures the input, retrieved context, tool calls with parameters, tool results, and final output?",
           "weight": 5
         },
         {
+          "id": "02b",
           "question": "Are logs tamper-evident (append-only, signed, or in an audit-grade store) and retained long enough to support regulatory or incident investigations?",
           "weight": 5
         }
@@ -90,10 +94,12 @@
       "failure_mode": "An agent ingests content it did not author — a support ticket, a PDF, a webpage, an\nemail — and that content contains instructions disguised as data. The agent follows\nthe instructions. It exfiltrates secrets via a tool call to an attacker-controlled\nURL, or it takes privileged actions on behalf of the attacker. The team only\ndiscovers the breach when the downstream damage becomes visible.\n",
       "verification": [
         {
-          "question": "Is every piece of untrusted content (user input, retrieved documents, tool outputs from external sources) treated as data, not as instructions, with clear delimiters and system-prompt boundaries?",
+          "id": "03a",
+          "question": "Do automated prompt-injection tests verify that untrusted content cannot override trusted instructions or expand tool permissions?",
           "weight": 5
         },
         {
+          "id": "03b",
           "question": "Are outbound tool calls constrained so the agent cannot send data to arbitrary destinations (no open URL fetch, no arbitrary email recipients, no free-form webhooks)?",
           "weight": 5
         }
@@ -128,10 +134,12 @@
       "failure_mode": "An agent handles a high-stakes case autonomously because no escalation threshold was\ndefined. Weeks later, a regulator, a customer, or a lawyer asks why a human did not\nreview it. The answer — \"the agent did not flag it\" — is not an answer. The failure\nwas not the agent's judgment; the failure was the absence of a policy telling the\nagent when its judgment should yield to a human.\n",
       "verification": [
         {
+          "id": "04a",
           "question": "For every agent capability, is there a declared threshold (financial, legal, reputational, confidence-based) above which the agent must pause for human approval?",
           "weight": 5
         },
         {
+          "id": "04b",
           "question": "Is the escalation path itself tested — does a real human actually receive, review, and either approve or deny the pause within the declared SLA?",
           "weight": 5
         }
@@ -166,10 +174,12 @@
       "failure_mode": "An agent starts producing harmful output at 3 AM. The on-call engineer tries to stop\nit and discovers there is no single button. Disabling it requires revoking API keys,\npushing a config change, waiting for a deploy, and hoping the in-flight requests\nfinish. By the time the agent is actually silent, the incident has been running for\n45 minutes and the damage is done.\n",
       "verification": [
         {
+          "id": "05a",
           "question": "Is there a single documented action (one button, one CLI command, one feature flag) that stops the agent from taking any new action within 30 seconds?",
           "weight": 5
         },
         {
+          "id": "05b",
           "question": "For each destructive or public-facing capability, is there a reversible path — dry-run mode, staging replay, compensating transaction — that can undo recent agent actions?",
           "weight": 5
         }
@@ -204,10 +214,12 @@
       "failure_mode": "A debug prompt is saved to a branch with a Slack bot token inlined. A logging\nmiddleware prints the full HTTP request including the Authorization header. An agent\nsummarizes its context back to a user and the summary contains a rotating OAuth\ntoken. None of these are exotic attacks; they are the default path when secrets are\ntreated as ordinary strings inside agent workflows.\n",
       "verification": [
         {
+          "id": "06a",
           "question": "Are all secrets injected via a secret manager (AWS Secrets Manager, Vault, environment of the orchestrator) rather than hardcoded in prompts, configs, or repo files?",
           "weight": 5
         },
         {
+          "id": "06b",
           "question": "Is there automated scanning — at commit time and at log-write time — that prevents secrets from leaking into repos, logs, telemetry, or agent outputs?",
           "weight": 5
         }
@@ -242,10 +254,12 @@
       "failure_mode": "A new model version ships. Benchmarks are slightly better on paper. The team upgrades\nin production. A week later, support tickets reveal the agent is now refusing valid\nrequests, or hallucinating on a specific edge case, or subtly changing its tone in a\nway that violates the brand. There was no regression suite that would have caught\nany of this before the rollout.\n",
       "verification": [
         {
+          "id": "07a",
           "question": "Is there a versioned evaluation suite with representative inputs, expected behaviors, and automated grading that runs on every model or prompt change?",
           "weight": 5
         },
         {
+          "id": "07b",
           "question": "Do production releases require the eval suite to pass with no regressions against the previous version, not just absolute score thresholds?",
           "weight": 5
         }
@@ -280,10 +294,12 @@
       "failure_mode": "A RAG pipeline indexes a shared drive. The index includes HR files, M&A working\ndocuments, legal hold material, and customer PII. An employee asks the agent a\nbenign question; the retrieval step pulls a paragraph from a confidential document\nand feeds it into the answer. The agent happily summarizes it. The employee now\nknows something they were never authorized to see.\n",
       "verification": [
         {
+          "id": "08a",
           "question": "Does the retrieval layer enforce access-control at query time (row-level security, per-user corpora, ACL filters) — not just at the UI layer of the source system?",
           "weight": 5
         },
         {
+          "id": "08b",
           "question": "Is the RAG corpus audited for data classes (PII, PHI, trade secrets, legal-privileged, retention-limited) with a declared policy for each, including what may not be indexed at all?",
           "weight": 5
         }
@@ -320,10 +336,12 @@
       "failure_mode": "An agent enters a loop — maybe a tool call fails and triggers a retry, maybe two\nagents are calling each other, maybe a user input leads it into a recursive\nclarification cycle. By the time anyone notices, the LLM bill has grown by a factor\nof a thousand, rate limits on the downstream API are exhausted, and legitimate\ntraffic is being rejected. The fix is easy. Preventing it was easier.\n",
       "verification": [
         {
+          "id": "09a",
           "question": "Is there a hard spending cap, enforced at the orchestration layer, that halts the agent when daily/hourly cost crosses a declared threshold?",
           "weight": 5
         },
         {
+          "id": "09b",
           "question": "Are per-agent and per-user rate limits enforced independently of the LLM provider's own limits, with alerts firing before limits are hit?",
           "weight": 5
         }
@@ -358,10 +376,12 @@
       "failure_mode": "Two agents are working in parallel on adjacent problems. Each assumes it has\nexclusive access to a shared resource — a customer record, a calendar slot, a\nticket queue. They both commit conflicting updates within the same second. Or one\nagent emits output that the other treats as a trusted instruction without realizing\nit was generated by a peer. The system state becomes incoherent and the failure\ncascades.\n",
       "verification": [
         {
+          "id": "10a",
           "question": "When multiple agents access shared resources, is there a coordination layer (locks, queues, transactional commits, conflict-resolution rules) that prevents race conditions and inconsistent writes?",
           "weight": 5
         },
         {
+          "id": "10b",
           "question": "Are messages between agents cryptographically or structurally distinguishable from user or external inputs, so no agent treats peer output as a user instruction?",
           "weight": 5
         }
