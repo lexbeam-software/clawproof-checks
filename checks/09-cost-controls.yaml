@@ -12,9 +12,11 @@ failure_mode: |
   traffic is being rejected. The fix is easy. Preventing it was easier.
 
 verification:
-  - question: Is there a hard spending cap, enforced at the orchestration layer, that halts the agent when daily/hourly cost crosses a declared threshold?
+  - id: "09a"
+    question: Is there a hard spending cap, enforced at the orchestration layer, that halts the agent when daily/hourly cost crosses a declared threshold?
     weight: 5
-  - question: Are per-agent and per-user rate limits enforced independently of the LLM provider's own limits, with alerts firing before limits are hit?
+  - id: "09b"
+    question: Are per-agent and per-user rate limits enforced independently of the LLM provider's own limits, with alerts firing before limits are hit?
     weight: 5
 
 checklist:

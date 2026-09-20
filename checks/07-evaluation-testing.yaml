@@ -12,9 +12,11 @@ failure_mode: |
   any of this before the rollout.
 
 verification:
-  - question: Is there a versioned evaluation suite with representative inputs, expected behaviors, and automated grading that runs on every model or prompt change?
+  - id: "07a"
+    question: Is there a versioned evaluation suite with representative inputs, expected behaviors, and automated grading that runs on every model or prompt change?
     weight: 5
-  - question: Do production releases require the eval suite to pass with no regressions against the previous version, not just absolute score thresholds?
+  - id: "07b"
+    question: Do production releases require the eval suite to pass with no regressions against the previous version, not just absolute score thresholds?
     weight: 5
 
 checklist:

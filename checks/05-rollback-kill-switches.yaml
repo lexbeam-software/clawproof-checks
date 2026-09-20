@@ -12,9 +12,11 @@ failure_mode: |
   45 minutes and the damage is done.
 
 verification:
-  - question: Is there a single documented action (one button, one CLI command, one feature flag) that stops the agent from taking any new action within 30 seconds?
+  - id: "05a"
+    question: Is there a single documented action (one button, one CLI command, one feature flag) that stops the agent from taking any new action within 30 seconds?
     weight: 5
-  - question: For each destructive or public-facing capability, is there a reversible path — dry-run mode, staging replay, compensating transaction — that can undo recent agent actions?
+  - id: "05b"
+    question: For each destructive or public-facing capability, is there a reversible path — dry-run mode, staging replay, compensating transaction — that can undo recent agent actions?
     weight: 5
 
 checklist:

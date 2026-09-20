@@ -1,0 +1,7 @@
+{
+  "policy_version": "1.0.0",
+  "target": "invalid-example",
+  "answers": {
+    "01a": {"value": "probably", "evidence": []}
+  }
+}

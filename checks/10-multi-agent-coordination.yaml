@@ -13,9 +13,11 @@ failure_mode: |
   cascades.
 
 verification:
-  - question: When multiple agents access shared resources, is there a coordination layer (locks, queues, transactional commits, conflict-resolution rules) that prevents race conditions and inconsistent writes?
+  - id: "10a"
+    question: When multiple agents access shared resources, is there a coordination layer (locks, queues, transactional commits, conflict-resolution rules) that prevents race conditions and inconsistent writes?
     weight: 5
-  - question: Are messages between agents cryptographically or structurally distinguishable from user or external inputs, so no agent treats peer output as a user instruction?
+  - id: "10b"
+    question: Are messages between agents cryptographically or structurally distinguishable from user or external inputs, so no agent treats peer output as a user instruction?
     weight: 5
 
 checklist:

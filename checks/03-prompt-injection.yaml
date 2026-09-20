@@ -12,9 +12,11 @@ failure_mode: |
   discovers the breach when the downstream damage becomes visible.
 
 verification:
-  - question: Is every piece of untrusted content (user input, retrieved documents, tool outputs from external sources) treated as data, not as instructions, with clear delimiters and system-prompt boundaries?
+  - id: "03a"
+    question: Do automated prompt-injection tests verify that untrusted content cannot override trusted instructions or expand tool permissions?
     weight: 5
-  - question: Are outbound tool calls constrained so the agent cannot send data to arbitrary destinations (no open URL fetch, no arbitrary email recipients, no free-form webhooks)?
+  - id: "03b"
+    question: Are outbound tool calls constrained so the agent cannot send data to arbitrary destinations (no open URL fetch, no arbitrary email recipients, no free-form webhooks)?
     weight: 5
 
 checklist:

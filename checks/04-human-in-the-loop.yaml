@@ -12,9 +12,11 @@ failure_mode: |
   agent when its judgment should yield to a human.
 
 verification:
-  - question: For every agent capability, is there a declared threshold (financial, legal, reputational, confidence-based) above which the agent must pause for human approval?
+  - id: "04a"
+    question: For every agent capability, is there a declared threshold (financial, legal, reputational, confidence-based) above which the agent must pause for human approval?
     weight: 5
-  - question: Is the escalation path itself tested — does a real human actually receive, review, and either approve or deny the pause within the declared SLA?
+  - id: "04b"
+    question: Is the escalation path itself tested — does a real human actually receive, review, and either approve or deny the pause within the declared SLA?
     weight: 5
 
 checklist:

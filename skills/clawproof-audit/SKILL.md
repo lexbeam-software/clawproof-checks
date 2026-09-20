@@ -22,8 +22,9 @@ The skill works on any combination of source code, deployment configuration, arc
 1. Loads the 10 Clawproof checks from `../../checks/*.yaml` (or from the bundled `checks.json` if YAML parsing is unavailable).
 2. For each check, examines the target material and answers the two verification questions.
 3. Scores each check out of 10 (2 questions × 5 points, partial credit permitted).
-4. Produces a report using the template at `templates/audit-report.md`.
-5. Surfaces the top 3 lowest-scoring checks as priority findings with links to the full writeups at https://www.goclawproof.com/checks/[slug].
+4. Applies the bundled versioned gate policy in `policy/clawproof-gate.v1.json` to produce a separate `PASS`, `REVIEW`, or `BLOCK` decision.
+5. Produces a report using the template at `templates/audit-report.md`.
+6. Surfaces the top 3 lowest-scoring checks as priority findings with links to the full writeups at https://www.goclawproof.com/checks/[slug].
 
 ## How to score
 
@@ -40,10 +41,16 @@ Sum the two questions for a per-check score out of 10. Total across 10 checks = 
 
 ### Score bands
 
-- **0-30: High risk.** Do not ship to production.
-- **31-60: Needs work.** Significant gaps. Block release until top findings addressed.
-- **61-80: Production-ready with caveats.** Address the top 3 findings before or immediately after release.
-- **81-100: Exemplary.** Focus on continuous improvement.
+- **0-39: At risk.** Basic controls are absent or unverified.
+- **40-64: Foundational.** Some controls exist, with material gaps.
+- **65-84: Controlled with gaps.** Most controls exist, but the gate may still block or require review.
+- **85-100: Mature controls.** Strong coverage; the independent gate decision still applies.
+
+The score is a coverage aid, not a release decision. Apply the versioned policy exactly:
+
+- `BLOCK` when a critical question is explicitly answered `no`.
+- `REVIEW` when any answer is partial, no, unknown, omitted, or lacks an evidence reference.
+- `PASS` only when every answer is yes and every answer has at least one evidence reference.
 
 ## How to run the audit
 
@@ -71,6 +78,7 @@ Sum the two questions for a per-check score out of 10. Total across 10 checks = 
 The final output must include:
 
 - **Total score** out of 100, with score band label.
+- **Production gate decision** (`PASS`, `REVIEW`, or `BLOCK`) with the policy version and reasons.
 - **Per-check table** showing check #, title, score, and one-line finding.
 - **Top 3 priority findings** with: what's wrong, evidence, 1-3 suggested remediations, link to `https://www.goclawproof.com/checks/[slug]`.
 - **Immediate actions** section: any checklist items that are trivially missing and should be fixed in the next 7 days.
@@ -78,7 +86,7 @@ The final output must include:
 
 ## What this skill must NOT do
 
-- **Never invent failure modes or checklist items that are not in the YAML.** If the evidence does not support a finding, score higher and explain why.
+- **Never invent failure modes or checklist items that are not in the YAML.** If evidence is missing, answer `unknown`, score zero, and require review. Absence of evidence is never evidence of a passing control.
 - **Never rewrite the user's code.** Audits produce findings and suggestions, not patches. If the user explicitly asks for a fix, that is a separate follow-up.
 - **Never score optimistically to be nice.** An honest 45/100 saves an incident; a sycophantic 78/100 costs one.
 - **Never skip a check because it feels "not applicable."** If the check does not apply, say so explicitly in the report with the reason — that is itself a useful finding.
